@@ -32,6 +32,25 @@ async function getAirplanes(){
     }
 }
 
-module.exports = {createAirplane,
-    getAirplanes
+async function getAirplane(data){
+    try {
+        const airplane = await airplRepository.get(data);
+        if(!airplane){
+            console.log("empty response in getairplane-service")
+        }
+        return airplane;
+    } catch (error) {
+        if(error.statusCode == StatusCodes.NOT_FOUND){
+            throw new AppError("The Airplane you requested is not present", error.statusCode)
+        }
+        throw new AppError("cannot fetch data of all the airplanes ", StatusCodes.INTERNAL_SERVER_ERROR)
+
+    }
+}
+
+
+module.exports = {
+    createAirplane,
+    getAirplanes,
+    getAirplane
 }
