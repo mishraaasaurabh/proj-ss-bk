@@ -1,0 +1,140 @@
+//get-max request
+#include <vector>
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+long getMaxRequests(vector<int> serverCapacity, vector<int> incomingRequests, int k) {
+    int n = serverCapacity.size();
+    long total = 0;
+    
+    // Calculate initial total requests handled
+    for (int i = 0; i < n; i++) {
+        total += min(serverCapacity[i], incomingRequests[i]);
+    }
+    
+    // Calculate potential gains for each server
+    vector<pair<int, int>> gains; // (gain, index)
+    for (int i = 0; i < n; i++) {
+        int current = min(serverCapacity[i], incomingRequests[i]);
+        int doubled = min(2 * serverCapacity[i], incomingRequests[i]);
+        int gain = doubled - current;
+        gains.push_back({gain, i});
+    }
+    
+    // Sort gains in descending order
+    sort(gains.begin(), gains.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
+        return a.first > b.first;
+    });
+    
+    // Apply top k gains
+    for (int i = 0; i < k; i++) {
+        total += gains[i].first;
+    }
+    
+    return total;
+}
+
+// Example usage
+int main() {
+    vector<int> serverCapacity = {10, 4, 3, 7};
+    vector<int> incomingRequests = {3, 10, 4, 5};
+    int k = 2;
+    
+    long result = getMaxRequests(serverCapacity, incomingRequests, k);
+    cout << "Maximum requests handled: " << result << endl; // Output: 27
+    
+    return 0;
+}
+
+//primesendingwith3 
+
+#include <bits/stdc++.h>
+using namespace std;
+
+// Sieve to get primes ending with 3
+vector<int> primesEndingWith3(int n) {
+    vector<bool> isPrime(n+1, true);
+    isPrime[0] = isPrime[1] = false;
+    for (int i=2; i*i<=n; i++) {
+        if (isPrime[i]) {
+            for (int j=i*i; j<=n; j+=i)
+                isPrime[j] = false;
+        }
+    }
+    vector<int> primes;
+    for (int i=2; i<=n; i++) {
+        if (isPrime[i] && i % 10 == 3)
+            primes.push_back(i);
+    }
+    return primes;
+}
+
+int maxScore(vector<int>& arr) {
+    int n = arr.size();
+    vector<long long> dp(n, LLONG_MIN);
+    dp[0] = arr[0];
+
+    vector<int> primes = primesEndingWith3(n);
+    
+    for (int i=1; i<n; i++) {
+        // Step of 1
+        dp[i] = dp[i-1] + arr[i];
+        // Prime jumps
+        for (int p : primes) {
+            if (i - p >= 0)
+                dp[i] = max(dp[i], dp[i-p] + arr[i]);
+            else break;
+        }
+    }
+    
+    return *max_element(dp.begin(), dp.end());
+}
+
+int main() {
+    vector<int> arr = {0, 2, 4, 1, 7, 8, 3};
+    cout << maxScore(arr) << endl;
+}
+
+
+//triplet with sum mod k
+int divisibleTripletCount(vector<int>& arr, int d)
+{
+    // Initialize variables
+    int n = arr.size();
+    int ans = 0;
+
+    // Store the count of pairs with a pair sum modulo d
+    unordered_map<int, int> dupletSums;
+
+    // Iterate over the array from the second element to
+    // the last
+    for (int k = 1; k < n; k++) {
+
+        // Calculate the expected remainder for the
+        // current element to form a divisible triplet
+        int expected = (d - (arr[k] % d) + d) % d;
+
+        // Add the count of pairs with the expected
+        // remainder to the answer
+        ans += dupletSums[expected];
+
+        // Iterate over the previous elements
+        for (int i = 0; i < k; i++) {
+
+            // Calculate the sum of the current element
+            // and the previous element modulo d
+            int x = (arr[i] + arr[k]) % d;
+
+            // Increment the count of pairs with the
+            // calculated sum in the map
+            dupletSums[x]++;
+        }
+    }
+
+    // Return the total count of divisible triplets
+    return ans;
+}
+
+
