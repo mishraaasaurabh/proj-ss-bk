@@ -44,6 +44,20 @@ async function getAirplane(data){
             throw new AppError("The Airplane you requested is not present", error.statusCode)
         }
         throw new AppError("cannot fetch data of all the airplanes ", StatusCodes.INTERNAL_SERVER_ERROR)
+        
+    }
+}
+
+async function destroyAirplane(data){
+    try {
+        const airplanes = await airplRepository.destroy(data);
+        return airplanes;
+    } catch (error) {
+        if(error.statusCode == StatusCodes.NOT_FOUND){
+            throw new AppError("The Airplane you requested to delete is not present", error.statusCode)
+
+        }
+        throw new AppError("cannot fetch data of all the airplanes ", StatusCodes.INTERNAL_SERVER_ERROR)
 
     }
 }
@@ -52,5 +66,6 @@ async function getAirplane(data){
 module.exports = {
     createAirplane,
     getAirplanes,
-    getAirplane
+    getAirplane,
+    destroyAirplane
 }
